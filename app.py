@@ -1,6 +1,6 @@
 #flask 라이브러리 안에 Flask 라는 객체 존재
 from flask import Flask, render_template, request
-from data import Articles
+from data import Articles #모듈 형식으로 data.py의 data 가져오기
 
 app = Flask(__name__) #__name__이라는 내장변수를 받아 새로운 instance인 app 생성
 app.debug = True #파일 저장할 때마다 서버 restart하려면 debug 설정 추가
