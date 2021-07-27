@@ -30,7 +30,10 @@
                                 <button class="btn btn-danger" onclick="return confirm('Do you really want to delete?')">delete</button>
                             </a>
                             
-                            <button class="btn btn-success">edit</button>
+                            <a href="/{{ article[0] }}/edit">
+                                <button class="btn btn-success">edit</button>
+                            </a>
+                           
                         </td>
                     </tr>
                 {% endfor %}
