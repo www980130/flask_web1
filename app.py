@@ -27,7 +27,18 @@ def detail(id):
         print(articles[int(id)-1])
         return render_template('detail.html', article = articles[int(id)-1])
 
-
+@app.route('/article/add', methods=['GET','POST'])
+def add_article():
+    if request.method == 'GET':
+        return render_template('add_article.html')
+    elif request.method == 'POST':
+        # print(request.form) # >>ImmutableMultiDict([('test', 'kim'), ('work', 'insert')])])
+        # print(request.form.get('test')) # >>kim
+        title = print(request.form['title'])
+        description = print(request.form['description'])
+        author = print(request.form['author'])
+        
+        return "SUCCESS"
 
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':
