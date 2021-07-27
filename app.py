@@ -65,7 +65,20 @@ def add_article():
 
         return redirect('/')
 
+@app.route('/<id>/delete', methods=['GET'])
+def del_article(id):
+    # SQL query 작성
+    sql= f"DELETE FROM `o2`.`lists` WHERE(`id` = '{int(id)}')"
+    # print(sql)
+
+    # SQL query 실행
+    cursor.execute(sql)
+    
+    # 데이터 변화 적용
+    db.commit()
+    return redirect('/')
+
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':
     app.run(port=5000)
-
+1
