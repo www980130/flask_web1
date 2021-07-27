@@ -26,19 +26,36 @@ def hello_world(): #함수 생성
     articles = Articles() #articles는 리스트
     # print(articles)
     
+    sql= f"SELECT * FROM lists;"
+    # print(sql)
+
+    # SQL query 실행
+    cursor.execute(sql)
+    articles = cursor.fetchall()
+    # print(articles[0][1]) #data는 tuple 형태
+
     # return render_template('index.html', data = "Main Page")
 
-    for i in articles:
-        print(i['title'])
+    # for i in articles:
+        # print(i['title'])
+        # print(i[1])
     return render_template('index.html', articles = articles)
 
 #render_template : detail.html을 rendering
 @app.route('/<id>/article', methods=['GET', 'POST'])
 def detail(id):
     if request.method == 'GET':
-        articles = Articles()
-        print(articles[int(id)-1])
-        return render_template('detail.html', article = articles[int(id)-1])
+        # articles = Articles()
+        # print(articles[int(id)-1])
+        sql= f"SELECT * FROM lists WHERE id = {int(id)};"
+        # print(sql)
+
+        # SQL query 실행
+        cursor.execute(sql)
+        article = cursor.fetchone() #fetchall하면 indexing 2번 됨 
+        print(article)
+        return render_template('detail.html', article = article)
+        # return render_template('detail.html', article = articles[int(id)-1])
 
 @app.route('/article/add', methods=['GET','POST'])
 def add_article():
@@ -78,7 +95,8 @@ def del_article(id):
     db.commit()
     return redirect('/')
 
+
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':
     app.run(port=5000)
-1
+

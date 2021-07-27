@@ -2,8 +2,9 @@
 
     {% block body %}
         <!-- <h1>DETAIL PAGE</h1> -->
-        <h3>제목 : {{ article['title']}}</h3>
-        <header>작가 : {{ article['author']}}</header>
-        <span>내용 : <br>{{ article['body']}}</span>
-        <footer>날짜 : {{ article['create_date']}}</footer>
+        <!-- <h3>제목 : {{ article['title']}}</h3> -->
+        <h3>제목 : {{ article[1]}}</h3>
+        <header>작가 : {{ article[3]}}</header>
+        <span>내용 : <br>{{ article[2]}}</span>
+        <footer>날짜 : {{ article[4]}}</footer>
     {% endblock %}
