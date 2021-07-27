@@ -19,6 +19,7 @@ def hello_world(): #함수 생성
         print(i['title'])
     return render_template('index.html', articles = articles)
 
+#render_template : detail.html을 rendering
 @app.route('/<id>/article', methods=['GET', 'POST'])
 def detail(id):
     if request.method == 'GET':
