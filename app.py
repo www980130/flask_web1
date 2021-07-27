@@ -1,9 +1,22 @@
 #flask 라이브러리 안에 Flask 라는 객체 존재
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from data import Articles #모듈 형식으로 data.py의 data 가져오기
+import pymysql
 
 app = Flask(__name__) #__name__이라는 내장변수를 받아 새로운 instance인 app 생성
 app.debug = True #파일 저장할 때마다 서버 restart하려면 debug 설정 추가
+
+# database에 접근
+db= pymysql.connect(host='localhost',
+                     port=3306,
+                     user='root',
+                     passwd='agee04041**',
+                     db='o2',
+                     charset='utf8')
+
+# database를 사용하기 위한 cursor를 세팅합니다.
+cursor= db.cursor() 
+
 
 @app.route('/', methods=['GET', 'POST']) # @: decorate
 def hello_world(): #함수 생성
@@ -34,11 +47,23 @@ def add_article():
     elif request.method == 'POST':
         # print(request.form) # >>ImmutableMultiDict([('test', 'kim'), ('work', 'insert')])])
         # print(request.form.get('test')) # >>kim
-        title = print(request.form['title'])
-        description = print(request.form['description'])
-        author = print(request.form['author'])
+        title = request.form['title']
+        description = request.form['description']
+        author = request.form['author']
         
-        return "SUCCESS"
+        # SQL query 작성
+        sql= f"""INSERT INTO lists(title, description, author) 
+        VALUES('{title}', '{description}', '{author}');"""
+        # print(sql)
+
+        # SQL query 실행
+        cursor.execute(sql)
+        
+        # 데이터 변화 적용
+        db.commit()
+
+
+        return redirect('/')
 
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':
