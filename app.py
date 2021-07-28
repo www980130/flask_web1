@@ -1,4 +1,5 @@
 #flask 라이브러리 안에 Flask 라는 객체 존재
+from functools import wraps
 from flask import Flask, render_template, request, redirect, session
 from data import Articles #모듈 형식으로 data.py의 data 가져오기
 import pymysql
@@ -18,11 +19,23 @@ db= pymysql.connect(host='localhost',
 # database를 사용하기 위한 cursor를 세팅합니다.
 cursor= db.cursor() 
 
+def is_loged_in(func):
+    @wraps(func)
+    def wrap(*args, **kwargs):
+        if 'is_loged' in session:
+            return func(*args, **kwargs)
+        else:
+            return redirect('/login')
+    return wrap
+
+
 @app.route('/')
+@is_loged_in
 def main():
     return render_template('index.html')
 
 @app.route('/articles', methods=['GET', 'POST']) # @: decorate
+@is_loged_in
 def articles(): #함수 생성
     # return 'Hello World!'
     # return render_template('index.html', data = "안녕하세요 김태경 입니다.")
@@ -47,6 +60,7 @@ def articles(): #함수 생성
 
 #render_template : detail.html을 rendering
 @app.route('/<id>/article', methods=['GET', 'POST'])
+@is_loged_in
 def detail(id):
     if request.method == 'GET':
         # articles = Articles()
@@ -62,6 +76,7 @@ def detail(id):
         # return render_template('detail.html', article = articles[int(id)-1])
 
 @app.route('/article/add', methods=['GET','POST'])
+@is_loged_in
 def add_article():
     if request.method == 'GET':
         return render_template('add_article.html')
@@ -87,6 +102,7 @@ def add_article():
         return redirect('/')
 
 @app.route('/<id>/delete', methods=['GET'])
+@is_loged_in
 def del_article(id):
     # SQL query 작성
     sql= f"DELETE FROM `o2`.`lists` WHERE(`id` = '{int(id)}')"
@@ -100,6 +116,7 @@ def del_article(id):
     return redirect('/')
 
 @app.route('/<id>/edit', methods=['GET','POST'])
+@is_loged_in
 def edit_article(id):
     if request.method == 'GET':
         sql= f"SELECT * FROM lists WHERE id = {int(id)};"
@@ -199,6 +216,11 @@ def login():
                 return render_template('index.html', username = session['username'])
             else:
                 return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
 
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':
