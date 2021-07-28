@@ -1,5 +1,5 @@
 #flask 라이브러리 안에 Flask 라는 객체 존재
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from data import Articles #모듈 형식으로 data.py의 data 가져오기
 import pymysql
 from passlib.hash import pbkdf2_sha256
@@ -174,7 +174,31 @@ def register():
         else:
             return render_template('register.html', form = form)
 
+@app.route('/login', methods=['GET','POST'])
+def login():
+    if request.method == "GET":
+        return render_template('login.html')
+    else:
+        user_id = request.form['id']
+        password = request.form['password']
 
+        sql = f"SELECT * FROM users WHERE user_id = '{user_id}'"
+
+        cursor.execute(sql)
+
+        user = cursor.fetchone()
+        print(user)
+        if user == None:
+            return render_template('login.html')
+        else:
+            user_db_pw = user[5]
+            result = pbkdf2_sha256.verify(password, user_db_pw)
+            if result:
+                session['is_loged'] = True
+                session['username'] = user[2]
+                return render_template('index.html', username = session['username'])
+            else:
+                return render_template('login.html')
 
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':

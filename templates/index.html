@@ -1,6 +1,6 @@
 {% extends "layouts.html" %}
 
     {% block body %}
-        <h1> Hello ?, Welcome!</h1>
+        <h1> Hello {{ session['username'] }}, Welcome!</h1>
         <h2>This is a Main Page.</h2>
     {% endblock %}
