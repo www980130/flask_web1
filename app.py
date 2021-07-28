@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, redirect
 from data import Articles #모듈 형식으로 data.py의 data 가져오기
 import pymysql
+from passlib.hash import pbkdf2_sha256
 
 app = Flask(__name__) #__name__이라는 내장변수를 받아 새로운 instance인 app 생성
 app.debug = True #파일 저장할 때마다 서버 restart하려면 debug 설정 추가
@@ -17,9 +18,12 @@ db= pymysql.connect(host='localhost',
 # database를 사용하기 위한 cursor를 세팅합니다.
 cursor= db.cursor() 
 
+@app.route('/')
+def main():
+    return render_template('index.html')
 
-@app.route('/', methods=['GET', 'POST']) # @: decorate
-def hello_world(): #함수 생성
+@app.route('/articles', methods=['GET', 'POST']) # @: decorate
+def articles(): #함수 생성
     # return 'Hello World!'
     # return render_template('index.html', data = "안녕하세요 김태경 입니다.")
     
@@ -39,7 +43,7 @@ def hello_world(): #함수 생성
     # for i in articles:
         # print(i['title'])
         # print(i[1])
-    return render_template('index.html', articles = articles)
+    return render_template('articles.html', articles = articles)
 
 #render_template : detail.html을 rendering
 @app.route('/<id>/article', methods=['GET', 'POST'])
@@ -125,7 +129,57 @@ def edit_article(id):
         db.commit()
 
         return redirect('/')
+
+#form 체크할 수 있는 라이브러리 추가
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, EqualTo
+
+class RegisterForm(FlaskForm):
+    id = StringField('ID', validators=[DataRequired()])
+    name = StringField('NAME', validators=[DataRequired()])
+    email = StringField('EMAIL', validators=[DataRequired()])
+    phone = StringField('PHONE NUMBER', validators=[DataRequired()])
+    password = PasswordField('PASSWORD', validators=[DataRequired()]) #equalTo("필드네임")
+    repassword = PasswordField('REPASSWORD', validators=[DataRequired(), EqualTo('password', message="test")])
+    submit = SubmitField("Signup")
+# id가 들어왔는지 확인하고 비밀번호 확인
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+    form = RegisterForm()
+    if request.method == 'GET':
+        return render_template('register.html', form = form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            user_id = request.form['id'] #두 가지 방법 있음 -1.form 인덱싱
+            name = request.form.get('name') #2.get방식
+            email = request.form['email']
+            phone = request.form['phone']
+            password = pbkdf2_sha256.hash(request.form['password'])
+            sql = f"SELECT user_id FROM users WHERE user_id = '{user_id}'"
+        
+            cursor.execute(sql)
+            user = cursor.fetchone()
+            
+            if user != None:
+                return render_template('register.html', form = form)
+            else:
+                sql = f"""INSERT INTO users(user_id, name, email, phone, password)
+                VALUES('{user_id}','{name}','{email}','{phone}','{password}');"""
+                cursor.execute(sql)
+
+                db.commit()
+                return "SUCCESS"
+        else:
+            return render_template('register.html', form = form)
+
+
+
 #내장변수가 name이면 다음 함수를 실행시켜라
 if __name__ == '__main__':
+    app.config['SECRET_KEY']="secret"
     app.run(port=5000)
+
+
 

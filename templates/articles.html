@@ -1,0 +1,43 @@
+{% extends "layouts.html" %}
+
+    {% block body %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>title</th>
+                    <!-- <th>description</th> -->
+                    <th>author</th>
+                    <th>date</th>
+                    <th>etc</th>
+                </tr>
+            </thead>
+
+        <!-- <h1>안녕하세요!!!</h1> -->
+        <!-- flask에서 jinja2 엔진 활용한 예 -->
+        <!-- <h1>{{ articles }}</h1> -->
+        <!-- <table style="width:100%"> -->
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ article[0] }}</td> <!-- <td>{{ article['id'] }}</td> -->
+                        <td><a href="/{{ article[0] }}/article">{{ article[1] }}</a></td>
+                        <!-- <td>{{ article['body'] }}</td> -->
+                        <td>{{ article[3] }}</td>
+                        <td>{{ article[4] }}</td>
+                        <td>
+                            <a href="/{{ article[0] }}/delete">
+                                <button class="btn btn-danger" onclick="return confirm('Do you really want to delete?')">delete</button>
+                            </a>
+                            
+                            <a href="/{{ article[0] }}/edit">
+                                <button class="btn btn-success">edit</button>
+                            </a>
+                           
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>    
+        </table>
+        <a href="/article/add"><button class="btn btn-warning">write</button></a>
+    {% endblock %}
